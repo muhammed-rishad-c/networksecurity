@@ -19,13 +19,6 @@ from networksecurity.logging.custom_logger import logging
 
 import pymongo, certifi
 
-client = pymongo.MongoClient(
-    "mongodb+srv://sampletester322004:Admin123@cluster0.v7kyyme.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-    tls=True,
-    tlsCAFile=certifi.where()
-)
-
-print(client.list_database_names())
 
 class NetworkDataExtract():
     def __init__(self):
