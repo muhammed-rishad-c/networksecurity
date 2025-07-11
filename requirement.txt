@@ -6,4 +6,4 @@ dill
 pymongo[srv]==3.6
 pymongo
 certifi
-
+pyaml
