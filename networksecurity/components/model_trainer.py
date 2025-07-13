@@ -16,12 +16,25 @@ from sklearn.ensemble import (
     GradientBoostingClassifier,
     RandomForestClassifier
 )
+import mlflow
 
 class ModelTrainer:
     def __init__(self,data_transformation_artifact:DataTransformationArtifacts,
                  model_trainer_config:ModelTrainerConfig):
         self.data_transformation_artifact=data_transformation_artifact
         self.model_trainer_config=model_trainer_config
+        
+    
+    def track_mlflow(self,best_model,classificationmetric):
+        with mlflow.start_run():
+            f1_score=classificationmetric.f1_score
+            precision_score=classificationmetric.precision_score
+            recall_score=classificationmetric.recall_score
+            
+            mlflow.log_metric("f1_score",f1_score)
+            mlflow.log_metric("precision_score",precision_score)
+            mlflow.log_metric("recall_score",recall_score)
+            mlflow.sklearn.log_model(best_model,"model")
         
         
     def train_model(self,x_train,y_train,x_test,y_test):
@@ -71,6 +84,8 @@ class ModelTrainer:
         y_pred_train=best_model.predict(x_train)
         
         classification_train_metrics=get_classification_score(y_true=y_train,y_pred=y_pred_train)
+        
+        self.track_mlflow(best_model,classification_train_metrics)
         
         y_pred_test=best_model.predict(x_test)
         classification_test_metrics=get_classification_score(y_true=y_test,y_pred=y_pred_test)
