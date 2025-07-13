@@ -7,3 +7,7 @@ pymongo>=4.0
 certifi
 pyaml
 mlflow
+dagshub
+fastapi
+uvicorn
+python-multipart

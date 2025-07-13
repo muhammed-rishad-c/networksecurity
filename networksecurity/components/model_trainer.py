@@ -18,6 +18,9 @@ from sklearn.ensemble import (
 )
 import mlflow
 
+import dagshub
+dagshub.init(repo_owner='muhammed-rishad-c', repo_name='networksecurity', mlflow=True)
+
 class ModelTrainer:
     def __init__(self,data_transformation_artifact:DataTransformationArtifacts,
                  model_trainer_config:ModelTrainerConfig):
@@ -27,6 +30,12 @@ class ModelTrainer:
     
     def track_mlflow(self,best_model,classificationmetric):
         with mlflow.start_run():
+            import joblib
+            joblib.dump(best_model, "best_model.pkl")
+
+    # Log manually as artifact
+            mlflow.log_artifact("best_model.pkl")
+
             f1_score=classificationmetric.f1_score
             precision_score=classificationmetric.precision_score
             recall_score=classificationmetric.recall_score
@@ -34,7 +43,7 @@ class ModelTrainer:
             mlflow.log_metric("f1_score",f1_score)
             mlflow.log_metric("precision_score",precision_score)
             mlflow.log_metric("recall_score",recall_score)
-            mlflow.sklearn.log_model(best_model,"model")
+            #mlflow.sklearn.log_model(best_model,"model")
         
         
     def train_model(self,x_train,y_train,x_test,y_test):
@@ -96,7 +105,8 @@ class ModelTrainer:
         os.makedirs(dir_name,exist_ok=True)
         
         network_model=NetworkModel(preprocessor=preprocessor,model=best_model)
-        save_object(self.model_trainer_config.trained_model_file_path,obj=NetworkModel)
+        save_object(self.model_trainer_config.trained_model_file_path,obj=network_model)
+        save_object("final_model/model.pkl",best_model)
         
         model_trainer_artifact=ModelTrainerArtifact(trained_model_file_path=self.model_trainer_config.trained_model_file_path,
                              train_metric_artifact=classification_train_metrics,
